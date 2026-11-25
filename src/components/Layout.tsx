@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { BookOpen, CheckCircle2, ListChecks } from "lucide-react";
+import { BookOpen, CalendarCheck, CheckCircle2, ListChecks } from "lucide-react";
 
 const links = [
-  { href: "/", label: "Heute", icon: CheckCircle2 },
+  { href: "/", label: "Heute", icon: CalendarCheck },
+  { href: "/pool", label: "Pool", icon: CheckCircle2 },
   { href: "/dinge", label: "Dinge", icon: ListChecks },
   { href: "/verlauf", label: "Verlauf", icon: BookOpen }
 ];

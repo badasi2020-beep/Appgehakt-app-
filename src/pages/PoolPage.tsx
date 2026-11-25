@@ -2,16 +2,18 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Plus, X } from "lucide-react";
 import { ThingRow } from "../components/ThingRow";
 import { EntryEditDialog } from "../components/EntryEditDialog";
+import { QuickNoteDialog } from "../components/QuickNoteDialog";
 import { dayKey, formatDuration, timeOnly } from "../lib/utils";
 import { makeId } from "../store";
 import type { Entry, Store, Thing } from "../types";
 
-export function Home({ store, update }: { store: Store; update: (patch: Partial<Store>) => void }) {
+export function PoolPage({ store, update }: { store: Store; update: (patch: Partial<Store>) => void }) {
   const [running, setRunning] = useState<{ thingId: string; startedAt: number } | null>(null);
   const [, setTick] = useState(0);
   const [freeOpen, setFreeOpen] = useState(false);
   const [free, setFree] = useState({ name: "", categoryId: store.categories[0]?.id ?? "", duration: "" });
   const [editing, setEditing] = useState<Entry | null>(null);
+  const [noteFor, setNoteFor] = useState<Thing | null>(null);
 
   useEffect(() => {
     if (!running) return undefined;
@@ -22,7 +24,7 @@ export function Home({ store, update }: { store: Store; update: (patch: Partial<
   const today = dayKey(new Date().toISOString());
   const todaysEntries = store.entries.filter((entry) => dayKey(entry.at) === today).sort((a, b) => b.at.localeCompare(a.at));
 
-  const logEntry = (thing: Thing, durationMinutes: number | null) => {
+  const logEntry = (thing: Thing, durationMinutes: number | null, note?: string) => {
     const category = store.categories.find((cat) => cat.id === thing.categoryId);
     const entry: Entry = {
       id: makeId("entry"),
@@ -31,7 +33,8 @@ export function Home({ store, update }: { store: Store; update: (patch: Partial<
       categoryId: thing.categoryId,
       categoryNameSnapshot: category?.name ?? "",
       at: new Date().toISOString(),
-      durationMinutes
+      durationMinutes,
+      note: note || undefined
     };
     update({ entries: [entry, ...store.entries] });
   };
@@ -81,7 +84,8 @@ export function Home({ store, update }: { store: Store; update: (patch: Partial<
       <div className="page-heading">
         <div>
           <div className="eyebrow">{new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}</div>
-          <h1>Heute</h1>
+          <h1>Pool</h1>
+          <p className="subtitle">Alle deine Dinge zum jederzeit Eintragen, unabhängig von der Planung.</p>
         </div>
         <button className="btn btn-primary" onClick={() => setFreeOpen(true)} data-testid="button-free-entry">
           <Plus size={16} />
@@ -101,6 +105,7 @@ export function Home({ store, update }: { store: Store; update: (patch: Partial<
               category={store.categories.find((cat) => cat.id === thing.categoryId)}
               running={running?.thingId === thing.id ? running.startedAt : null}
               onLogNow={(t) => logEntry(t, null)}
+              onLogWithNote={(t) => setNoteFor(t)}
               onToggleTimer={toggleTimer}
             />
           ))}
@@ -203,6 +208,7 @@ export function Home({ store, update }: { store: Store; update: (patch: Partial<
       )}
 
       {editing && <EntryEditDialog entry={editing} onClose={() => setEditing(null)} onSave={saveEntry} onDelete={deleteEntry} />}
+      {noteFor && <QuickNoteDialog title={noteFor.name} onClose={() => setNoteFor(null)} onSave={(note) => logEntry(noteFor, null, note)} />}
     </div>
   );
 }

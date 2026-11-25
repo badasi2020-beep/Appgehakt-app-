@@ -115,6 +115,14 @@ h3 { font-size: 17px; letter-spacing: -.02em; }
 .icon-choice { display: flex; gap: 6px; flex-wrap: wrap; }
 .icon-btn { width: 35px; height: 35px; border: 1px solid hsl(var(--border)); border-radius: 10px; background: hsl(var(--card)); color: hsl(var(--muted-foreground)); display: grid; place-items: center; }
 .icon-btn.active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+.color-choice { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; padding: 0; }
+.color-swatch.active { border-color: hsl(var(--foreground)); box-shadow: 0 0 0 2px hsl(var(--card)); }
+.weekday-choice { display: flex; gap: 6px; }
+.weekday-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid hsl(var(--border)); background: hsl(var(--card)); color: hsl(var(--muted-foreground)); font-size: 12px; font-weight: 700; }
+.weekday-btn.active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+.tag-overdue { background: hsl(3 57% 93%); color: hsl(3 57% 42%); }
+.dismiss-popover { position: absolute; right: 0; top: 44px; z-index: 6; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 14px; padding: 8px; display: grid; gap: 6px; box-shadow: 0 12px 30px hsl(166 26% 20% / .14); white-space: nowrap; }
 .timeline { display: grid; gap: 0; }
 .timeline-item { position: relative; padding: 0 0 22px 27px; border-left: 1px solid hsl(var(--border)); }
 .timeline-item:last-child { border-left-color: transparent; padding-bottom: 0; }

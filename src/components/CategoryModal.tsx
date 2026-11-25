@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Trash2, X } from "lucide-react";
 import { CATEGORY_ICONS, CategoryIcon } from "./CategoryIcon";
+import { CATEGORY_COLORS } from "../lib/colors";
 import type { Category } from "../types";
 
 export function CategoryModal({
@@ -11,15 +12,16 @@ export function CategoryModal({
 }: {
   category?: Category;
   onClose: () => void;
-  onSave: (data: { name: string; icon: string }) => void;
+  onSave: (data: { name: string; icon: string; color: string }) => void;
   onDelete?: () => void;
 }) {
   const [name, setName] = useState(category?.name ?? "");
   const [icon, setIcon] = useState(category?.icon ?? CATEGORY_ICONS[0]);
+  const [color, setColor] = useState(category?.color ?? CATEGORY_COLORS[0]);
 
   const submit = () => {
     if (!name.trim()) return;
-    onSave({ name: name.trim(), icon });
+    onSave({ name: name.trim(), icon, color });
     onClose();
   };
 
@@ -50,9 +52,26 @@ export function CategoryModal({
                   className={`icon-btn ${icon === value ? "active" : ""}`}
                   onClick={() => setIcon(value)}
                   data-testid={`button-icon-${value}`}
+                  style={icon === value ? { background: color, borderColor: color, color: "white" } : undefined}
                 >
                   <CategoryIcon name={value} />
                 </button>
+              ))}
+            </div>
+          </div>
+          <div className="field full">
+            <label>Farbe</label>
+            <div className="color-choice">
+              {CATEGORY_COLORS.map((value) => (
+                <button
+                  type="button"
+                  key={value}
+                  className={`color-swatch ${color === value ? "active" : ""}`}
+                  style={{ background: value }}
+                  onClick={() => setColor(value)}
+                  data-testid={`button-color-${value}`}
+                  title={value}
+                />
               ))}
             </div>
           </div>

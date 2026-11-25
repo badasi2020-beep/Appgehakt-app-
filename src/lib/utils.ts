@@ -26,6 +26,15 @@ export function dayKey(iso: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+// Stabiler Schlüssel pro Kalenderwoche (Montag als erster Tag), z.B. zum Weglegen "für diese Woche".
+export function weekKey(iso: string): string {
+  const d = new Date(iso);
+  d.setHours(0, 0, 0, 0);
+  const day = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - day);
+  return dayKey(d.toISOString());
+}
+
 export function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} Min.`;
   const h = Math.floor(minutes / 60);

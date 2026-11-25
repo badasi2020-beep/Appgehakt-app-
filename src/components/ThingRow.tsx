@@ -1,4 +1,4 @@
-import { Check, Timer } from "lucide-react";
+import { Check, MessageSquarePlus, Timer } from "lucide-react";
 import type { Category, Thing } from "../types";
 
 export function ThingRow({
@@ -6,13 +6,15 @@ export function ThingRow({
   category,
   running,
   onLogNow,
-  onToggleTimer
+  onToggleTimer,
+  onLogWithNote
 }: {
   thing: Thing;
   category?: Category;
   running?: number | null;
   onLogNow: (thing: Thing) => void;
   onToggleTimer: (thing: Thing) => void;
+  onLogWithNote: (thing: Thing) => void;
 }) {
   return (
     <div className="task-row" data-testid={`row-thing-${thing.id}`}>
@@ -22,10 +24,19 @@ export function ThingRow({
       <div className="task-main">
         <div className="task-name">{thing.name}</div>
         <div className="task-detail">
-          <span className="category-dot" />
+          <span className="category-dot" style={{ background: category?.color }} />
           {category?.name}
         </div>
       </div>
+      <button
+        type="button"
+        className="btn btn-ghost btn-icon"
+        onClick={() => onLogWithNote(thing)}
+        data-testid={`button-note-${thing.id}`}
+        title="Mit Notiz eintragen"
+      >
+        <MessageSquarePlus size={17} />
+      </button>
       <button
         type="button"
         className="btn btn-ghost btn-icon"

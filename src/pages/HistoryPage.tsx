@@ -6,9 +6,12 @@ import type { Entry, Store } from "../types";
 
 export function HistoryPage({ store, update }: { store: Store; update: (patch: Partial<Store>) => void }) {
   const [search, setSearch] = useState("");
+  const [categoryId, setCategoryId] = useState<string | null>(null);
   const [editing, setEditing] = useState<Entry | null>(null);
 
-  const filtered = store.entries.filter((entry) => entry.nameSnapshot.toLowerCase().includes(search.toLowerCase()));
+  const filtered = store.entries.filter(
+    (entry) => entry.nameSnapshot.toLowerCase().includes(search.toLowerCase()) && (!categoryId || entry.categoryId === categoryId)
+  );
 
   const groups = useMemo(() => {
     const byDay = new Map<string, Entry[]>();
@@ -31,6 +34,8 @@ export function HistoryPage({ store, update }: { store: Store; update: (patch: P
     setEditing(null);
   };
 
+  const colorFor = (catId: string) => store.categories.find((c) => c.id === catId)?.color;
+
   return (
     <div className="content">
       <div className="page-heading">
@@ -50,6 +55,23 @@ export function HistoryPage({ store, update }: { store: Store; update: (patch: P
           data-testid="input-search-history"
         />
       </div>
+      <div className="toolbar">
+        <button type="button" className={`filter-pill ${categoryId === null ? "active" : ""}`} onClick={() => setCategoryId(null)} data-testid="button-filter-cat-alle">
+          Alle Kategorien
+        </button>
+        {store.categories.map((cat) => (
+          <button
+            key={cat.id}
+            type="button"
+            className={`filter-pill ${categoryId === cat.id ? "active" : ""}`}
+            onClick={() => setCategoryId(cat.id)}
+            style={categoryId === cat.id ? { background: cat.color, borderColor: cat.color, color: "white" } : undefined}
+            data-testid={`button-filter-cat-${cat.id}`}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
       {groups.length ? (
         groups.map(([key, entries]) => (
           <section className="card card-pad" key={key} style={{ marginBottom: 14 }}>
@@ -60,7 +82,10 @@ export function HistoryPage({ store, update }: { store: Store; update: (patch: P
             <div className="timeline">
               {entries.map((entry) => (
                 <button type="button" className="timeline-item entry-item" key={entry.id} onClick={() => setEditing(entry)} data-testid={`history-entry-${entry.id}`}>
-                  <div className="timeline-title">{entry.nameSnapshot}</div>
+                  <div className="timeline-title">
+                    <span className="category-dot" style={{ background: colorFor(entry.categoryId), marginRight: 7 }} />
+                    {entry.nameSnapshot}
+                  </div>
                   <div className="timeline-meta">
                     {timeOnly(entry.at)} · {entry.categoryNameSnapshot}
                     {entry.durationMinutes ? ` · ${formatDuration(entry.durationMinutes)}` : ""}

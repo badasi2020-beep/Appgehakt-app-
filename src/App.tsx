@@ -3,7 +3,8 @@ import { Route, Switch, Router as WouterRouter, useLocation } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
 import { ErrorBoundary } from "./components/error-boundary";
 import { Layout } from "./components/Layout";
-import { Home } from "./pages/Home";
+import { HeutePage } from "./pages/HeutePage";
+import { PoolPage } from "./pages/PoolPage";
 import { DingePage } from "./pages/DingePage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { NotFound } from "./pages/NotFound";
@@ -27,7 +28,10 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/">
-          <Home store={store} update={update} />
+          <HeutePage store={store} update={update} />
+        </Route>
+        <Route path="/pool">
+          <PoolPage store={store} update={update} />
         </Route>
         <Route path="/dinge">
           <DingePage store={store} update={update} notify={notify} />

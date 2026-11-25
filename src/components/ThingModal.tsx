@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { Trash2, X } from "lucide-react";
-import type { Category, Thing } from "../types";
+import { WEEKDAY_LABELS } from "../lib/schedule";
+import { dayKey } from "../lib/utils";
+import type { Category, Schedule, Thing, Weekday } from "../types";
+
+type ScheduleKind = "none" | "once" | "daily" | "weekly";
 
 export function ThingModal({
   thing,
   categories,
   defaultCategoryId,
+  defaultSchedule,
   onClose,
   onSave,
   onDelete
@@ -13,16 +18,32 @@ export function ThingModal({
   thing?: Thing;
   categories: Category[];
   defaultCategoryId?: string;
+  defaultSchedule?: Schedule;
   onClose: () => void;
-  onSave: (data: { name: string; categoryId: string }) => void;
+  onSave: (data: { name: string; categoryId: string; schedule: Schedule | null }) => void;
   onDelete?: () => void;
 }) {
+  const initialSchedule = thing?.schedule ?? defaultSchedule ?? null;
   const [name, setName] = useState(thing?.name ?? "");
   const [categoryId, setCategoryId] = useState(thing?.categoryId ?? defaultCategoryId ?? categories[0]?.id ?? "");
+  const [scheduleKind, setScheduleKind] = useState<ScheduleKind>(initialSchedule?.kind ?? "none");
+  const [onceDate, setOnceDate] = useState(initialSchedule?.kind === "once" ? initialSchedule.date : dayKey(new Date().toISOString()));
+  const [weekdays, setWeekdays] = useState<Weekday[]>(initialSchedule?.kind === "weekly" ? initialSchedule.weekdays : []);
+
+  const toggleWeekday = (day: Weekday) => {
+    setWeekdays((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day].sort()));
+  };
 
   const submit = () => {
     if (!name.trim() || !categoryId) return;
-    onSave({ name: name.trim(), categoryId });
+    let schedule: Schedule | null = null;
+    if (scheduleKind === "once") schedule = { kind: "once", date: onceDate };
+    else if (scheduleKind === "daily") schedule = { kind: "daily" };
+    else if (scheduleKind === "weekly") {
+      if (weekdays.length === 0) return;
+      schedule = { kind: "weekly", weekdays };
+    }
+    onSave({ name: name.trim(), categoryId, schedule });
     onClose();
   };
 
@@ -59,6 +80,47 @@ export function ThingModal({
                 </option>
               ))}
             </select>
+          </div>
+          <div className="field full">
+            <label>Zeitplan (für die "Heute"-Seite)</label>
+            <div className="toolbar" style={{ marginBottom: scheduleKind === "none" ? 0 : 10 }}>
+              {(
+                [
+                  ["none", "Kein fester Zeitplan"],
+                  ["once", "Einmalig"],
+                  ["daily", "Täglich"],
+                  ["weekly", "Wöchentlich"]
+                ] as [ScheduleKind, string][]
+              ).map(([value, label]) => (
+                <button
+                  type="button"
+                  key={value}
+                  className={`filter-pill ${scheduleKind === value ? "active" : ""}`}
+                  onClick={() => setScheduleKind(value)}
+                  data-testid={`button-schedule-${value}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {scheduleKind === "once" && (
+              <input type="date" className="input" value={onceDate} onChange={(e) => setOnceDate(e.target.value)} data-testid="input-schedule-date" />
+            )}
+            {scheduleKind === "weekly" && (
+              <div className="weekday-choice">
+                {WEEKDAY_LABELS.map((label, index) => (
+                  <button
+                    type="button"
+                    key={label}
+                    className={`weekday-btn ${weekdays.includes(index as Weekday) ? "active" : ""}`}
+                    onClick={() => toggleWeekday(index as Weekday)}
+                    data-testid={`button-weekday-${index}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="form-actions" style={{ justifyContent: onDelete ? "space-between" : "flex-end" }}>

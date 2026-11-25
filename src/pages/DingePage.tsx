@@ -5,6 +5,7 @@ import { CategoryModal } from "../components/CategoryModal";
 import { ThingModal } from "../components/ThingModal";
 import { ThingStatsDialog } from "../components/ThingStatsDialog";
 import { EntryEditDialog } from "../components/EntryEditDialog";
+import { scheduleLabel } from "../lib/schedule";
 import { makeId } from "../store";
 import type { Category, Entry, Store, Thing } from "../types";
 
@@ -17,7 +18,7 @@ export function DingePage({ store, update, notify }: { store: Store; update: (pa
 
   const selectedCategory = store.categories.find((cat) => cat.id === selectedCategoryId) || null;
 
-  const saveCategory = (data: { name: string; icon: string }) => {
+  const saveCategory = (data: { name: string; icon: string; color: string }) => {
     if (categoryModal && categoryModal !== "new") {
       update({ categories: store.categories.map((cat) => (cat.id === categoryModal.id ? { ...cat, ...data } : cat)) });
       notify("Kategorie aktualisiert.");
@@ -38,7 +39,7 @@ export function DingePage({ store, update, notify }: { store: Store; update: (pa
     notify("Kategorie gelöscht.");
   };
 
-  const saveThing = (data: { name: string; categoryId: string }) => {
+  const saveThing = (data: { name: string; categoryId: string; schedule: Thing["schedule"] }) => {
     const now = new Date().toISOString();
     if (thingModal && thingModal !== "new") {
       update({ things: store.things.map((thing) => (thing.id === thingModal.id ? { ...thing, ...data, updatedAt: now } : thing)) });
@@ -87,7 +88,7 @@ export function DingePage({ store, update, notify }: { store: Store; update: (pa
               return (
                 <div className="task-row" key={category.id}>
                   <button type="button" className="category-row" style={{ display: "flex", alignItems: "center", gap: 13, flex: 1 }} onClick={() => setSelectedCategoryId(category.id)} data-testid={`button-category-${category.id}`}>
-                    <span className="icon-btn" style={{ background: "hsl(var(--secondary))", color: "hsl(var(--secondary-foreground))" }}>
+                    <span className="icon-btn" style={{ background: category.color, borderColor: category.color, color: "white" }}>
                       <CategoryIcon name={category.icon} />
                     </span>
                     <div className="task-main">
@@ -146,8 +147,10 @@ export function DingePage({ store, update, notify }: { store: Store; update: (pa
         <div className="task-list">
           {thingsInCategory.map((thing) => (
             <div className="task-row" key={thing.id}>
+              <span className="category-dot" style={{ background: selectedCategory.color }} />
               <div className="task-main">
                 <div className="task-name">{thing.name}</div>
+                <div className="task-detail">{scheduleLabel(thing.schedule)}</div>
               </div>
               <button type="button" className="btn btn-ghost btn-icon" onClick={() => setStatsThing(thing)} data-testid={`button-stats-${thing.id}`} title="Auswertung">
                 <BarChart3 size={16} />
