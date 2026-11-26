@@ -26,7 +26,7 @@ export function DueThingRow({
   const [dismissOpen, setDismissOpen] = useState(false);
 
   return (
-    <div className="task-row" data-testid={`row-due-${thing.id}`}>
+    <div className="task-row" style={{ borderLeft: `4px solid ${category?.color || "transparent"}` }} data-testid={`row-due-${thing.id}`}>
       <button type="button" className="task-check" onClick={() => onLogNow(thing)} data-testid={`button-log-${thing.id}`} title="Als erledigt abhaken">
         <Check size={15} />
       </button>

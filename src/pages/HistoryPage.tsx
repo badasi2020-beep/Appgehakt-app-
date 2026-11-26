@@ -81,7 +81,14 @@ export function HistoryPage({ store, update }: { store: Store; update: (patch: P
             </div>
             <div className="timeline">
               {entries.map((entry) => (
-                <button type="button" className="timeline-item entry-item" key={entry.id} onClick={() => setEditing(entry)} data-testid={`history-entry-${entry.id}`}>
+                <button
+                  type="button"
+                  className="timeline-item entry-item"
+                  key={entry.id}
+                  style={{ borderLeftColor: colorFor(entry.categoryId) }}
+                  onClick={() => setEditing(entry)}
+                  data-testid={`history-entry-${entry.id}`}
+                >
                   <div className="timeline-title">
                     <span className="category-dot" style={{ background: colorFor(entry.categoryId), marginRight: 7 }} />
                     {entry.nameSnapshot}

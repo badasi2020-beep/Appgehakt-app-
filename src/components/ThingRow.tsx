@@ -17,7 +17,7 @@ export function ThingRow({
   onLogWithNote: (thing: Thing) => void;
 }) {
   return (
-    <div className="task-row" data-testid={`row-thing-${thing.id}`}>
+    <div className="task-row" style={{ borderLeft: `4px solid ${category?.color || "transparent"}` }} data-testid={`row-thing-${thing.id}`}>
       <button type="button" className="task-check" onClick={() => onLogNow(thing)} data-testid={`button-log-${thing.id}`} title="Jetzt eintragen">
         <Check size={15} />
       </button>

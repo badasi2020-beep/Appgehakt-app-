@@ -146,8 +146,7 @@ export function DingePage({ store, update, notify }: { store: Store; update: (pa
       <section className="card card-pad">
         <div className="task-list">
           {thingsInCategory.map((thing) => (
-            <div className="task-row" key={thing.id}>
-              <span className="category-dot" style={{ background: selectedCategory.color }} />
+            <div className="task-row" style={{ borderLeft: `4px solid ${selectedCategory.color}` }} key={thing.id}>
               <div className="task-main">
                 <div className="task-name">{thing.name}</div>
                 <div className="task-detail">{scheduleLabel(thing.schedule)}</div>

@@ -125,7 +125,14 @@ export function PoolPage({ store, update }: { store: Store; update: (patch: Part
         </div>
         <div className="timeline">
           {todaysEntries.map((entry) => (
-            <button type="button" className="timeline-item entry-item" key={entry.id} onClick={() => setEditing(entry)} data-testid={`entry-${entry.id}`}>
+            <button
+              type="button"
+              className="timeline-item entry-item"
+              key={entry.id}
+              style={{ borderLeftColor: store.categories.find((c) => c.id === entry.categoryId)?.color }}
+              onClick={() => setEditing(entry)}
+              data-testid={`entry-${entry.id}`}
+            >
               <div className="timeline-title">{entry.nameSnapshot}</div>
               <div className="timeline-meta">
                 {timeOnly(entry.at)} · {entry.categoryNameSnapshot}
