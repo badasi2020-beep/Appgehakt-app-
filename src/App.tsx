@@ -7,6 +7,7 @@ import { HeutePage } from "./pages/HeutePage";
 import { PoolPage } from "./pages/PoolPage";
 import { DingePage } from "./pages/DingePage";
 import { HistoryPage } from "./pages/HistoryPage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { NotFound } from "./pages/NotFound";
 import { useStore } from "./store";
 
@@ -38,6 +39,9 @@ function Router() {
         </Route>
         <Route path="/verlauf">
           <HistoryPage store={store} update={update} />
+        </Route>
+        <Route path="/einstellungen">
+          <SettingsPage store={store} update={update} notify={notify} />
         </Route>
         <Route component={NotFound} />
       </Switch>
