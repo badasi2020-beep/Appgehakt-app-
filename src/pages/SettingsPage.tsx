@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { Pencil, Plus } from "lucide-react";
+import { useRef, useState } from "react";
+import { Download, Pencil, Plus, Upload } from "lucide-react";
 import { CategoryIcon } from "../components/CategoryIcon";
 import { CategoryModal } from "../components/CategoryModal";
-import { makeId } from "../store";
+import { makeId, normalize, seed } from "../store";
 import type { Category, Store } from "../types";
 
 export function SettingsPage({ store, update, notify }: { store: Store; update: (patch: Partial<Store>) => void; notify: (text: string) => void }) {
   const [categoryModal, setCategoryModal] = useState<Category | "new" | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const saveCategory = (data: { name: string; icon: string; color: string }) => {
     if (categoryModal && categoryModal !== "new") {
@@ -27,6 +28,34 @@ export function SettingsPage({ store, update, notify }: { store: Store; update: 
     update({ categories: store.categories.filter((cat) => cat.id !== category.id) });
     setCategoryModal(null);
     notify("Kategorie gelöscht.");
+  };
+
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify(store, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `abgehakt-sicherung-${stamp}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    notify("Sicherung gespeichert.");
+  };
+
+  const importData = async (file: File) => {
+    try {
+      const parsed = JSON.parse(await file.text());
+      if (!Array.isArray(parsed?.categories) || !Array.isArray(parsed?.things) || !Array.isArray(parsed?.entries)) {
+        notify("Das sieht nicht nach einer Abgehakt-Sicherung aus.");
+        return;
+      }
+      const ok = window.confirm("Die aktuell auf diesem Gerät gespeicherten Daten werden dabei durch die Sicherung ersetzt. Fortfahren?");
+      if (!ok) return;
+      update(normalize({ ...seed, ...parsed }));
+      notify("Daten wiederhergestellt.");
+    } catch {
+      notify("Datei konnte nicht gelesen werden.");
+    }
   };
 
   return (
@@ -71,6 +100,42 @@ export function SettingsPage({ store, update, notify }: { store: Store; update: 
           )}
         </div>
       </section>
+
+      <section className="card card-pad" style={{ marginTop: 18 }}>
+        <div className="section-head">
+          <div>
+            <div className="section-label">Deine Daten</div>
+            <h2 style={{ marginTop: 5 }}>Sichern &amp; Wiederherstellen</h2>
+          </div>
+        </div>
+        <p className="subtitle" style={{ marginTop: 0, marginBottom: 16 }}>
+          Alles liegt nur auf diesem Gerät/in diesem Browser. Lade regelmäßig eine Sicherung herunter - z.B. um sie auf ein anderes
+          Gerät oder einen anderen Browser zu übertragen.
+        </p>
+        <div className="toolbar" style={{ marginBottom: 0 }}>
+          <button type="button" className="btn btn-soft" onClick={exportData} data-testid="button-export-data">
+            <Download size={16} />
+            Sichern
+          </button>
+          <button type="button" className="btn btn-soft" onClick={() => fileInputRef.current?.click()} data-testid="button-import-data">
+            <Upload size={16} />
+            Wiederherstellen
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) importData(file);
+              e.target.value = "";
+            }}
+            data-testid="input-import-file"
+          />
+        </div>
+      </section>
+
       {categoryModal && (
         <CategoryModal
           category={categoryModal === "new" ? undefined : categoryModal}

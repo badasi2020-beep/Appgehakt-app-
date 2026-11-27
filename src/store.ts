@@ -7,7 +7,7 @@ const FALLBACK_COLORS = ["#2F7A6F", "#C76B3C", "#7A5FB0", "#B0486B", "#4A7FB5", 
 
 // Füllt Felder auf, die in älteren gespeicherten Daten (vor diesem Feature) noch fehlen,
 // damit bereits erfasste Kategorien/Dinge nicht verloren gehen.
-function normalize(value: Store): Store {
+export function normalize(value: Store): Store {
   return {
     ...value,
     categories: value.categories.map((cat, index) => ({ ...cat, color: cat.color ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length] })),
@@ -17,7 +17,7 @@ function normalize(value: Store): Store {
 }
 
 // Ein paar Beispiele zum Start - lassen sich jederzeit umbenennen oder löschen.
-const seed: Store = {
+export const seed: Store = {
   categories: [
     { id: "c1", name: "Haushalt", icon: "Home", color: "#2F7A6F" },
     { id: "c2", name: "Gesundheit", icon: "HeartPulse", color: "#C76B3C" },
